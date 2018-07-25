@@ -140,7 +140,6 @@ class StartView(DataEntryView):
             redcap_completion_codes = get_and_cache_completion_codes(self)
         return redcap_completion_codes
 
-
     def get_context_data(self, **kwargs):
         context = super(StartView, self).get_context_data(**kwargs)
         form_url = '{root}/dataentry/protocoldatasource/{pds_id}/subject/{subject_id}/record/{record_id}/form_spec/'.format(
@@ -151,7 +150,7 @@ class StartView(DataEntryView):
         if "redcap" in str(driverClass):
             cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes'.format(root=self.service_client.self_root_path, **kwargs)
             subject_id = context['subject'].id
-            record_id = context ['record'].id
+            record_id = context['record'].id
             record_name = context['record'].record_id
             redcap_form_complete_codes = self.redcap_form_complete_caching(self.driver, cache_key, subject_id, record_id, record_name)
             context['subRecordSelectionForm'] = self.generateSubRecordSelectionForm(
