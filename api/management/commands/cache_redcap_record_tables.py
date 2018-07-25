@@ -36,7 +36,6 @@ class Command(BaseCommand):
             subs = [eHBSubjectSerializer(sub).data for sub in subjects]
             for s in subs:
                 subject_ids.append(s['id'])
-                # self.cache_records(protocol, s['id'], lbls)
         return subject_ids
 
     def get_protocol_user(self, protocol):
@@ -53,7 +52,7 @@ class Command(BaseCommand):
         user = users.get(username=username)
         return user
 
-    def get_protocoldatasource (self, protocol):
+    def get_protocoldatasource(self, protocol):
         protocoldatasources = protocol.getProtocolDataSources()
         # assuming redcap data source is always numbered as 1
         try:
@@ -87,7 +86,7 @@ class Command(BaseCommand):
             r.append(e)
         return r
 
-    def cache_redcap_form_complete (self, pds, user, cache_key, s_id, r_id, r_name):
+    def cache_redcap_form_complete(self, pds, user, cache_key, s_id, r_id, r_name):
         form_url = '/dataentry/protocoldatasource/' + str(pds.id) + '/subject/' + str(s_id) + '/record/' + str(r_id)+ '/form_spec/'
         # create redcap driver
         driver = DriverUtils.getDriverFor(protocol_data_source=pds, user=user)
@@ -99,10 +98,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        def subject_threading(self,pds, s_id, lbls, user, cache_key):
+        def subject_threading(self, pds, s_id, lbls, user, cache_key):
             # get all records associated with subject
             records = self.get_subject_records(pds,s_id, lbls)
-            record_data = {}
             for record in records:
                 r_id = record['id']
                 r_name = record['record_id']
