@@ -14,9 +14,6 @@ from django.core.management.base import BaseCommand
 from django.core.cache import cache
 
 from dataentry.views.pds import StartView
-from dataentry.views.base import DataEntryView
-
-from rest_framework.response import Response
 
 
 class Command(BaseCommand):
@@ -97,7 +94,7 @@ class Command(BaseCommand):
         # instantiate an instance of the Class StartView in pds.py
         sv = StartView()
         # call the method to cache redcap completion codes
-        form = sv.redcap_form_complete_caching(driver, cache_key, s_id, r_id, form_url, r_name)
+        form = sv.redcap_form_complete_caching(driver, cache_key, s_id, r_id, r_name)
         return form
 
     def handle(self, *args, **options):
