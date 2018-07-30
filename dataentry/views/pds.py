@@ -123,7 +123,7 @@ class StartView(DataEntryView):
 
             subject_records[record_id] = completion_codes # {recordid: {form_spec: completion_code, form_spec: completion_code}}
             cache_data[subject_id] = subject_records # {subjectid: {recordid: {form_spec: completion_code, form_spec: completion_code}}}
-            cache.set(cache_key, cache_data)
+            cache.set(cache_key, cache_data, timeout=172800) # cache key expires after 2 days
             cache.persist(cache_key)
             return completion_codes
 
@@ -150,7 +150,7 @@ class StartView(DataEntryView):
         driverClass = inspect.getfile(self.driver.__class__)
         if "redcap" in str(driverClass):
             # cache_key = 'protocol{}_redcap_completion_codes'.format(root=self.service_client.self_root_path, **kwargs)
-            cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes'.format(root=self.service_client.self_root_path, **kwargs)
+            cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes_test2'.format(root=self.service_client.self_root_path, **kwargs)
             subject_id = context['subject'].id
             record_id = context['record'].id
             record_name = context['record'].record_id
@@ -212,7 +212,7 @@ class FormView(DataEntryView):
                     if record_id in subject_data:
                         del subject_data[record_id]
                     cache_data[subject_id] = subject_data
-                cache.set(cache_key, cache_data)
+                cache.set(cache_key, cache_data, timeout=172800) # cache key expires after 2 days
                 cache.persist(cache_key)
         except:
             raise Exception('Record form was not updated')
@@ -255,7 +255,7 @@ class FormView(DataEntryView):
             self.request.META['action'] = 'Form processed.'
             self.request.META['subject_id'] = context['subject'].id  #The ehb PK for this subject
             # For all processed forms, clear cache for record selection table
-            cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes'.format(
+            cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes_test2'.format(
                 root=self.service_client.self_root_path, **kwargs)
             subject_id = context['subject'].id
             record_id = context ['record'].id
