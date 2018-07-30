@@ -54,11 +54,14 @@ class Command(BaseCommand):
 
     def get_protocoldatasource(self, protocol):
         protocoldatasources = protocol.getProtocolDataSources()
-        # assuming redcap data source is always numbered as 1
+        # the driver RedCAP Client is indexed at 0
+        # redcap_pds = []
         try:
-            redcap_pds = protocoldatasources.filter(data_source_id=1)
+            redcap_pds = protocoldatasources.filter(driver=0)
             for pds in redcap_pds:
-                return pds
+                print ("this is pds")
+                print (pds)
+            return redcap_pds
         except:
             raise Exception("No protocol datasource")
 
@@ -115,25 +118,28 @@ class Command(BaseCommand):
         lbls = er_label_rh.query()
         protocols = self.get_protocols(options['protocol_id'])
         for protocol in protocols:
-            pds = self.get_protocoldatasource(protocol) # get redcap protocol datasource
-            user = self.get_protocol_user(protocol) # get eig user in protocol
-            subject_id_list = self.get_protocol_subjects(protocol, lbls) # get all subjects in protocol
-            try:
-                cache_key = 'protocoldatasource{0}'.format(pds.id) + '_redcap_completion_codes'
-                cache.delete(cache_key)
-            except AttributeError: # protocoldatasource wasn't properly configured
-                print (str(pds) + ' was skipped')
-                continue
+            protocoldatasources = self.get_protocoldatasource(protocol) # get redcap protocol datasource
+            print ("this is protocol dtasources 121")
+            print (protocoldatasources)
+            for pds in protocoldatasources:
+                user = self.get_protocol_user(protocol) # get eig user in protocol
+                subject_id_list = self.get_protocol_subjects(protocol, lbls) # get all subjects in protocol
+                try:
+                    cache_key = 'protocoldatasource{0}'.format(pds.id) + '_redcap_completion_codes'
+                    cache.delete(cache_key)
+                except AttributeError: # protocoldatasource wasn't properly configured
+                    print (str(pds) + ' was skipped')
+                    continue
 
-            threads = [] # array to hold all threads, length is # of records per subj
-            for s_id in subject_id_list: # for every subject
-                 # creating threads
-                curr_thread = threading.Thread(target=subject_threading, args=(self, pds, s_id, lbls, user, cache_key,))
-                threads.append(curr_thread)
-                curr_thread.start()
-            # make sure every thread has finished
-            for t in threads:
-                t.join()
+                threads = [] # array to hold all threads, length is # of records per subj
+                for s_id in subject_id_list: # for every subject
+                    # creating threads
+                    curr_thread = threading.Thread(target=subject_threading, args=(self, pds, s_id, lbls, user, cache_key,))
+                    threads.append(curr_thread)
+                    curr_thread.start()
+                # make sure every thread has finished
+                for t in threads:
+                    t.join()
 
         elapsed = time.time()-start
         print ("total caching time" + str (elapsed))
