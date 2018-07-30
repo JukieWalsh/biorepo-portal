@@ -53,17 +53,13 @@ class Command(BaseCommand):
         return user
 
     def get_protocoldatasource(self, protocol):
-        protocoldatasources = protocol.getProtocolDataSources()
-        # the driver RedCAP Client is indexed at 0
-        # redcap_pds = []
         try:
+            protocoldatasources = protocol.getProtocolDataSources()
+            # the driver RedCAP Client is indexed at 0
             redcap_pds = protocoldatasources.filter(driver=0)
-            for pds in redcap_pds:
-                print ("this is pds")
-                print (pds)
             return redcap_pds
         except:
-            raise Exception("No protocol datasource")
+            print ("Unable to find protocoldatasource")
 
     def get_subject_records(self, pds, subject, lbls):
         er_rh = ServiceClient.get_rh_for(record_type=ServiceClient.EXTERNAL_RECORD)
@@ -90,14 +86,17 @@ class Command(BaseCommand):
         return r
 
     def cache_redcap_form_complete(self, pds, user, cache_key, s_id, r_id, r_name):
-        form_url = '/dataentry/protocoldatasource/' + str(pds.id) + '/subject/' + str(s_id) + '/record/' + str(r_id)+ '/form_spec/'
-        # create redcap driver
-        driver = DriverUtils.getDriverFor(protocol_data_source=pds, user=user)
-        # instantiate an instance of the Class StartView in pds.py
-        sv = StartView()
-        # call the method to cache redcap completion codes
-        form = sv.redcap_form_complete_caching(driver, cache_key, s_id, r_id, r_name)
-        return form
+        try:
+            form_url = '/dataentry/protocoldatasource/' + str(pds.id) + '/subject/' + str(s_id) + '/record/' + str(r_id)+ '/form_spec/'
+            # create redcap driver
+            driver = DriverUtils.getDriverFor(protocol_data_source=pds, user=user)
+            # instantiate an instance of the Class StartView in pds.py
+            sv = StartView()
+            # call the method to cache redcap completion codes
+            form = sv.redcap_form_complete_caching(driver, cache_key, s_id, r_id, r_name)
+            return form
+        except:
+            print ("error in caching redcap tables")
 
     def handle(self, *args, **options):
 
@@ -119,9 +118,8 @@ class Command(BaseCommand):
         protocols = self.get_protocols(options['protocol_id'])
         for protocol in protocols:
             protocoldatasources = self.get_protocoldatasource(protocol) # get redcap protocol datasource
-            print ("this is protocol dtasources 121")
-            print (protocoldatasources)
             for pds in protocoldatasources:
+                print ("\n Caching protocol datasource {} \n".format(pds))
                 user = self.get_protocol_user(protocol) # get eig user in protocol
                 subject_id_list = self.get_protocol_subjects(protocol, lbls) # get all subjects in protocol
                 try:
