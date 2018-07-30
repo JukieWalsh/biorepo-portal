@@ -78,7 +78,8 @@ class StartView(DataEntryView):
                 if event_index == -1: # nonlong study
                     key = str(driver.form_names.index(form_name))
                 else:
-                    key = str(list(driver.form_data.keys()).index(form_name)) + "_" + str(event_index)
+                    key = str(driver.form_data_ordered.index(form_name)) + "_" + str(event_index)
+                    # key = str(list(driver.form_data.keys()).index(form_name)) + "_" + str(event_index)
                 if (form_complete_value == '1'):
                     form_statuses[key] = 1
                 elif (form_complete_value == '2'):
@@ -128,6 +129,8 @@ class StartView(DataEntryView):
 
         cache_data = cache.get(cache_key)
         if cache_data: # cache key exists
+            print ("this is cache")
+            print (cache_data)
             if subject_id in cache_data:
                 subject_records = cache_data[subject_id]   # get all records of the subject
                 if record_id in subject_records:
@@ -148,6 +151,7 @@ class StartView(DataEntryView):
         # Get name of driver class to differentiate between Redcap and Nautilus
         driverClass = inspect.getfile(self.driver.__class__)
         if "redcap" in str(driverClass):
+            # cache_key = 'protocol{}_redcap_completion_codes'.format(root=self.service_client.self_root_path, **kwargs)
             cache_key = 'protocoldatasource{pds_id}_redcap_completion_codes'.format(root=self.service_client.self_root_path, **kwargs)
             subject_id = context['subject'].id
             record_id = context['record'].id
