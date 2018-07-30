@@ -129,8 +129,6 @@ class StartView(DataEntryView):
 
         cache_data = cache.get(cache_key)
         if cache_data: # cache key exists
-            print ("this is cache")
-            print (cache_data)
             if subject_id in cache_data:
                 subject_records = cache_data[subject_id]   # get all records of the subject
                 if record_id in subject_records:
