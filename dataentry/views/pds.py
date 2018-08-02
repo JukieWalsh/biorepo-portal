@@ -154,6 +154,7 @@ class StartView(DataEntryView):
             record_id = context['record'].id
             record_name = context['record'].record_id
             redcap_form_complete_codes = self.redcap_form_complete_caching(self.driver, cache_key, subject_id, record_id, record_name)
+            context['redcap_complete_legend'] = '<div class="pull-right"><div class="col-md-6"><table class = "table table-borderless"><tbody><tr><td style="border:none" align="center"> <button class="btn btn-primary"><i class="fa fa-circle-o"></i> </button></td><td style="border:none" align="center"> <button class="btn btn-warning"><i class="fa fa-adjust"></i> </button></td><td style="border:none" align="center"> <button class="btn btn-success"><i class="fa fa-circle"></i> </button></td> </tr> <tr><td style="border:none">Incomplete</td> <td style="border:none">Unverified</td><td style="border:none">Complete</td></tr> </tbody> </table></div></div> '
             context['subRecordSelectionForm'] = self.generateSubRecordSelectionForm(
                 self.driver, context['record'].record_id, form_url,0,1, redcap_form_complete_codes)
         else: # this is a nonredcap project
